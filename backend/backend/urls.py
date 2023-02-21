@@ -25,4 +25,5 @@ router.register(r'website', views.WebsiteView, 'website')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('run_scraper/', views.run_scraper, name='run_scraper'),
 ]
