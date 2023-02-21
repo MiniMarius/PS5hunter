@@ -23,12 +23,14 @@ class Scraper:
             in_stock = True
         name = soup.find("h1", {"class": "h1meoane h150u3pp"}).text
         url = soup.find('link', {'rel': 'canonical'})['href']
+        price_with_spaces = soup.find('span', {'class': 'bp5wbcj l1gqmknm'}).text
+        price = price_with_spaces.replace('\xa0', '').replace('kr', '')
         data = {
         'name': name,
         'website': 'Inet',
         'availability': in_stock,
         'url': url,
-        'price': 0,
+        'price': price,
         }
         return data
 
@@ -39,11 +41,14 @@ class Scraper:
         if soup.find("div", {"class": "stockstatus"}):
             in_stock = True
         name = soup.find('span', {'data-bind': 'text: webtext1'}).text
+        price = soup.find('span', {'class': 'product-price-now'})
+        link_tag = soup.find('link', {'rel': 'canonical'})
+        url = link_tag['href']
         data = {
         'name': name,
         'website': 'Komplett',
         'availability': in_stock,
-        'url': '',
+        'url': url,
         'price': 0,
         }
         return data
@@ -55,11 +60,14 @@ class Scraper:
         in_stock = False
         if soup.find("div", {"class": "stock-status"}):
             in_stock = True
+        name = soup.find('meta', {'property': 'og:title'})['content']
+        price = soup.find('div', class_='price-big')
+        url = soup.find('link', {'rel': 'canonical'})['href']
         data = {
-        'name': 'PS5',
+        'name': name,
         'website': 'Netonnet',
         'availability': in_stock,
-        'url': '',
+        'url': url,
         'price': 0,
         }
         return data
@@ -115,10 +123,8 @@ class Scraper:
             elif "komplett" in url:
                 scraped_data.append(self.check_item_in_stock_komplett(page_html))
 
-
             elif "webhallen" in url:
                 scraped_data.append(self.check_item_in_stock_webhallen())
-
 
             elif "netonnet" in url:
                 scraped_data.append(self.check_item_in_stock_netonnet(page_html))
