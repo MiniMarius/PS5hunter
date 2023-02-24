@@ -3,7 +3,7 @@ import time
 import requests
 from datetime import datetime
 from .models import Product
-
+import re
 class Scraper:
     def __init__(self):
         self.headers = {
@@ -19,7 +19,7 @@ class Scraper:
     def check_item_in_stock_inet(self, page_html):
         soup = BeautifulSoup(page_html, 'html5lib')
         in_stock = False
-        if soup.find("span", {"class": "in-stock stock-blob product-qty-blob"}):
+        if soup.find('span', class_=['s1ys0gx5', 's14li1pv']):
             in_stock = True
         name = soup.find("h1", {"class": "h1meoane h150u3pp"}).text
         url = soup.find('link', {'rel': 'canonical'})['href']
@@ -41,7 +41,9 @@ class Scraper:
         if soup.find("div", {"class": "stockstatus"}):
             in_stock = True
         name = soup.find('span', {'data-bind': 'text: webtext1'}).text
-        price = soup.find('span', {'class': 'product-price-now'})
+        price_tag = soup.find('span', {'class': 'product-price-now'})
+        price_text = price_tag.text.strip()
+        price_number = ''.join(filter(str.isdigit, price_text))
         link_tag = soup.find('link', {'rel': 'canonical'})
         url = link_tag['href']
         data = {
@@ -49,7 +51,7 @@ class Scraper:
         'website': 'Komplett',
         'availability': in_stock,
         'url': url,
-        'price': 0,
+        'price': price_number,
         }
         return data
         
@@ -61,14 +63,15 @@ class Scraper:
         if soup.find("div", {"class": "stock-status"}):
             in_stock = True
         name = soup.find('meta', {'property': 'og:title'})['content']
-        price = soup.find('div', class_='price-big')
+        price_text = soup.find('div', class_='price-big').text
+        price = int(''.join(filter(str.isdigit, price_text)))
         url = soup.find('link', {'rel': 'canonical'})['href']
         data = {
         'name': name,
         'website': 'Netonnet',
         'availability': in_stock,
         'url': url,
-        'price': 0,
+        'price': price,
         }
         return data
 
