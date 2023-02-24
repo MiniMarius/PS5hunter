@@ -78,21 +78,19 @@ class Scraper:
     # special case, uses webhallen's own server search API
     def check_item_in_stock_webhallen(self):
         BASE = "https://www.webhallen.com/api/product/"
-        product_ids = {"320479", "300815"}
-        for product_id in product_ids:
-            req = requests.get(BASE + product_id, headers=self.headers)
-            response_data = req.json()
-            product = response_data["product"]
-            in_stock = product["stock"]["web"] > 0
-            if in_stock:
-                print(product["name"])
-                print(product["price"]["price"])
+        product_id = "320479"
+        req = requests.get(BASE + product_id, headers=self.headers)
+        response_data = req.json()
+        product = response_data["product"]
+        name = product["variants"]["list"][0]["name"]
+        price = float(product["variants"]["list"][0]["price"]["price"])
+        availability = product["variants"]["list"][0]["stock"]["web"] > 0
         data = {
-        'name': 'Playstatiooon',
+        'name': name,
         'website': 'Webhallen',
-        'availability': in_stock,
+        'availability': availability,
         'url': '',
-        'price': 0,
+        'price': price,
         }
         return data        
     

@@ -53,3 +53,14 @@ class TestScraper(unittest.TestCase):
 
         data = self.scraper.check_item_in_stock_netonnet(page_html)
         self.assertEqual(data, expected_data)
+
+    def test_check_item_in_stock_webhallen(self):
+        expected_data = {
+            'name': 'Playstation 5 Konsol (PS5)',
+            'website': 'Webhallen',
+            'availability': True,
+            'url': '',
+            'price': 7290.0,
+        }
+        data = self.scraper.check_item_in_stock_webhallen()
+        self.assertEqual(data, expected_data)
