@@ -42,8 +42,10 @@ class Scraper:
             in_stock = True
         name = soup.find('span', {'data-bind': 'text: webtext1'}).text
         price_tag = soup.find('span', {'class': 'product-price-now'})
-        price_text = price_tag.text.strip()
-        price_number = ''.join(filter(str.isdigit, price_text))
+        price_number = 0
+        if price_tag:
+            price_text = price_tag.text.strip()
+            price_number = ''.join(filter(str.isdigit, price_text))
         link_tag = soup.find('link', {'rel': 'canonical'})
         url = link_tag['href']
         data = {
@@ -63,8 +65,11 @@ class Scraper:
         if soup.find("div", {"class": "stock-status"}):
             in_stock = True
         name = soup.find('meta', {'property': 'og:title'})['content']
-        price_text = soup.find('div', class_='price-big').text
-        price = int(''.join(filter(str.isdigit, price_text)))
+        price_soup = soup.find('div', class_='price-big')
+        price = 0
+        if price_soup:
+            price_text = price_soup.text
+            price = int(''.join(filter(str.isdigit, price_text)))
         url = soup.find('link', {'rel': 'canonical'})['href']
         data = {
         'name': name,
@@ -107,7 +112,7 @@ class Scraper:
 
 
     def check_inventory(self):
-        urls = {"https://www.inet.se/produkt/6609862/sony-playstation-5-digital-edition", "https://www.inet.se/produkt/6609649/sony-playstation-5", "https://www.komplett.se/product/1111557/gaming/playstation/playstation-5-ps5", "https://www.komplett.se/product/1161553/gaming/playstation/playstation-5-digital-edition-ps5", "https://www.webhallen.com/se/product/346166-MSI-Optix-G251F-25-IPS-1080p-1ms-165Hz-DP-HDMI-HDR-G-Sync", "https://www.netonnet.se/art/gaming/spel-och-konsol/playstation/playstation-konsol/sony-playstation-5/1012886.14413/", "https://www.netonnet.se/art/gaming/spel-och-konsol/playstation/playstation-konsol/sony-playstation-5-digital-edition/1013477.14413/" }
+        urls = {"https://www.inet.se/produkt/6609862/sony-playstation-5-digital-edition", "https://www.inet.se/produkt/6609649/sony-playstation-5", "https://www.komplett.se/product/1111557/gaming/playstation/playstation-5-ps5", "https://www.komplett.se/product/1161553/gaming/playstation/playstation-5-digital-edition-ps5", "https://www.webhallen.com/se/product/346166-MSI-Optix-G251F-25-IPS-1080p-1ms-165Hz-DP-HDMI-HDR-G-Sync", "https://www.netonnet.se/art/gaming/spel-och-konsol/playstation/playstation-konsol/sony-playstation-5-c-chassi/1027489.14413/", "https://www.netonnet.se/art/gaming/spel-och-konsol/playstation/playstation-konsol/sony-playstation-5-standard-god-of-war-ragnarok-voucher/1027712.14413/" }
         #testUrls = {"https://www.inet.se/produkt/5412819/d-link-e15-ax1500-mesh-range-extender",
                 #"https://www.komplett.se/product/1161554/gaming/tillbehor-till-spelkonsoler/playstation-5-hd-camera",
                # "https://www.webhallen.com/se/product/346166-MSI-Optix-G251F-25-IPS-1080p-1ms-165Hz-DP-HDMI-HDR-G-Sync",
