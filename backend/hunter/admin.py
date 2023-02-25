@@ -3,11 +3,11 @@ from .models import Product
 from .models import Website
 from .models import TagData
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'availability', 'url', 'price', 'date_created', 'date_updated', 'website')
+    list_display = ('id', 'name', 'availability', 'url', 'price', 'dateCreated', 'dateUpdated', 'website')
 class WebsiteAdmin(admin.ModelAdmin):
-    list_display = ('id','name', 'url', 'related_tag_data')
+    list_display = ('id','name', 'url', 'relatedTagData')
 class TagDataAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name_tag', 'price_tag', 'availability_tag', 'url_tag', 'related_website')
+    list_display = ('id', 'nameTag', 'priceTag', 'availabilityTag', 'urlTag', 'relatedWebsite')
 
 # Register your models here.
 
