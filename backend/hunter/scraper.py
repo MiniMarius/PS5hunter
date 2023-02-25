@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import time
 import requests
+from django.utils import timezone
 from datetime import datetime
 from .models import Product
 from .models import Website
@@ -12,37 +13,44 @@ class Scraper:
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15',
             'Accept-Language': 'en-US'}
         
-    def init_website_tags(name_tag, price_tag, availability_tag, url_tag, website_name, website_url):
+    def init_website_tags(self, name_tag, name_filter, price_tag, price_filter, availability_tag, availability_filter, url_tag,  url_filter,):
         tag_data = TagData()
-        tag_data.name_tag = name_tag
-        tag_data.price_tag = price_tag
-        tag_data.availability_tag = availability_tag
-        tag_data.url_tag = url_tag
-        tag_data.save()
-        
+        tag_data.nameTag = name_tag
+        tag_data.nameFilter = name_filter
+        tag_data.priceTag = price_tag
+        tag_data.priceFilter = price_filter
+        tag_data.availabilityTag = availability_tag
+        tag_data.availabilityFilter = availability_filter
+        tag_data.urlTag = url_tag
+        tag_data.urlFilter = url_filter
+        return tag_data
+
+    def create_scraping_object_komplett(self):
+        # Define website info
         website = Website()
-        website.name = website_name
-        website.url = website_url
-        website.related_tag_data = tag_data
+        website.name = 'Komplett'
+        website.url = 'https://www.komplett.se/category/12769/gaming/playstation'
+        website.save()
+
+        # Define the required HTML tags
+        name_tag = 'div'
+        name_filter = {'class': 'text-content'}
+        price_tag = 'span' 
+        price_filter = {'class': 'product-price-now'}
+        availability_tag = "div"
+        availability_filter = {"class": "stockstatus"}
+        url_tag = 'a'
+        url_filter = {"class": "product-link"}
+
+        # Initialize the Tag data object
+        tag_data = self.init_website_tags(name_tag, name_filter, price_tag, price_filter, availability_tag, availability_filter, url_tag, url_filter)
+        tag_data.relatedWebsite = website
+        tag_data.save()
+        website.relatedTagData = tag_data
         website.save()
         return website
 
-    def create_scraping_website_komplett():
-        # Define the required HTML tags
-        name_tag = '#product-name'
-        price_tag = '<span class="bp5wbcj">6&nbsp;790&nbsp;kr</span>'
-        availability_tag = '.availability'
-        url_tag = '.product-url'
-
-        # Define the name and URL of websute
-        website_name = 'My Website'
-        website_url = 'http://www.example.com'
-
-        # Initialize the website object and associated tag data
-        website = init_website_tags(name_tag, price_tag, availability_tag, url_tag, website_name, website_url)
-        return website
-
-    def scrape_website(website):
+    def scrape_website(self, website):
         # Make a request to the website URL
         response = requests.get(website.url, headers=self.headers)
 
@@ -50,20 +58,25 @@ class Scraper:
         soup = BeautifulSoup(response.content, 'html.parser')
 
         # Extract the product information using the specified HTML tags
-        product_name = soup.select_one(website.related_tag_data.name_tag).text
-        product_price = soup.select_one(website.related_tag_data.price_tag).text
-        product_availability = soup.select_one(website.related_tag_data.availability_tag).text
-        product_url = soup.select_one(website.related_tag_data.url_tag)['href']
+        product_name = soup.find(website.relatedTagData.nameTag, website.relatedTagData.nameFilter)
+        product_price = soup.find(website.relatedTagData.priceTag, website.relatedTagData.priceFilter)
+        product_availability = soup.find(website.relatedTagData.availabilityTag, website.relatedTagData.availabilityFilter)
+        product_url = soup.find(website.relatedTagData.urlTag, website.relatedTagData.urlFilter)['href']
+
+        print(product_name)
+        print(product_price)
+        print(product_availability)
+        print(product_url)
 
         # Create a new Product object related to the given Website object
         product = Product.objects.create(
-        name=product_name,
-        availability=(product_availability == 'In Stock'),
-        url=product_url,
-        price=float(product_price.strip('$').replace(',', '')),
-        website=website,
-        date_created=timezone.now(),
-        date_updated=timezone.now(),
+            name=product_name,
+            availability=(product_availability == 'In Stock'),
+            url=product_url,
+            price=product_price,
+            website=website,
+            dateCreated=timezone.now(),
+            dateUpdated=timezone.now(),
         )
         # Save the new Product object to the database
         product.save()
@@ -169,6 +182,6 @@ class Scraper:
 
 
     def check_inventory(self):
-        urls = {"https://www.inet.se/produkt/6609862/sony-playstation-5-digital-edition", "https://www.inet.se/produkt/6609649/sony-playstation-5", "https://www.komplett.se/product/1111557/gaming/playstation/playstation-5-ps5", "https://www.komplett.se/product/1161553/gaming/playstation/playstation-5-digital-edition-ps5", "https://www.webhallen.com/se/product/346166-MSI-Optix-G251F-25-IPS-1080p-1ms-165Hz-DP-HDMI-HDR-G-Sync", "https://www.netonnet.se/art/gaming/spel-och-konsol/playstation/playstation-konsol/sony-playstation-5-c-chassi/1027489.14413/", "https://www.netonnet.se/art/gaming/spel-och-konsol/playstation/playstation-konsol/sony-playstation-5-standard-god-of-war-ragnarok-voucher/1027712.14413/" }
-        print("yes")
+        website = self.create_scraping_object_komplett()
+        self.scrape_website(website)
         return 1

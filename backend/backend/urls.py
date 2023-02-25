@@ -21,6 +21,7 @@ from hunter import views
 router = routers.DefaultRouter()
 router.register(r'product', views.ProductView, 'product')
 router.register(r'website', views.WebsiteView, 'website')
+router.register(r"tagdata", views.TagDataView, "tagdata")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
