@@ -33,6 +33,8 @@ class Scraper:
         website.save()
 
         # Define the required HTML tags
+        product_tag = 'div'
+        product_filter = {'class': 'product-list-item'}
         name_tag = 'div'
         name_filter = {'class': 'text-content'}
         price_tag = 'span' 

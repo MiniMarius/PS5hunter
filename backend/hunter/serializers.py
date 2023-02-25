@@ -13,4 +13,4 @@ class WebsiteSerializer(serializers.ModelSerializer):
 class TagDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = TagData
-        fields = ('id', 'nameTag', 'nameFilter', 'priceTag', 'priceFilter', 'availabilityTag', 'availabilityFilter', 'urlTag', 'urlFilter', 'relatedWebsite')
+        fields = ('id', 'productTag', 'nameTag', 'nameFilter', 'priceTag', 'priceFilter', 'availabilityTag', 'availabilityFilter', 'urlTag', 'urlFilter', 'relatedWebsite')

@@ -19,6 +19,9 @@ class Product(models.Model):
 class TagData(models.Model):
     id = models.AutoField(primary_key=True)
     relatedWebsite = models.ForeignKey(Website, on_delete=models.CASCADE, related_name='tagData', null=True)
+
+    productTag = models.CharField(max_length=100, null=True)
+    productFilter = models.JSONField(null=True)
     
     nameTag = models.CharField(max_length=100, null=True)
     nameFilter = models.JSONField(null=True)

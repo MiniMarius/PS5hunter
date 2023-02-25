@@ -7,7 +7,7 @@ class ProductAdmin(admin.ModelAdmin):
 class WebsiteAdmin(admin.ModelAdmin):
     list_display = ('id','name', 'url', 'relatedTagData')
 class TagDataAdmin(admin.ModelAdmin):
-    list_display = ('id', 'nameTag', 'priceTag', 'availabilityTag', 'urlTag', 'relatedWebsite')
+    list_display = ('id', 'productTag', 'nameTag', 'priceTag', 'availabilityTag', 'urlTag', 'relatedWebsite')
 
 # Register your models here.
 
