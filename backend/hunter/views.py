@@ -3,8 +3,10 @@ from django.http import JsonResponse
 from rest_framework import viewsets
 from .serializers import ProductSerializer
 from .serializers import WebsiteSerializer
+from .serializers import TagDataSerializer
 from .models import Product
 from .models import Website
+from .models import TagData
 from .scraper import Scraper
 # Create your views here.
 
@@ -15,6 +17,10 @@ class ProductView(viewsets.ModelViewSet):
 class WebsiteView(viewsets.ModelViewSet):
     serializer_class = WebsiteSerializer
     queryset = Website.objects.all()
+
+class TagDataView(viewsets.ModelViewSet):
+    serializer_class = TagDataSerializer
+    queryset = TagData.objects.all()
 
 def run_scraper(request):
     # start scraper
@@ -28,3 +34,7 @@ def run_scraper(request):
     }
     # return a success response
     return JsonResponse(response)
+
+def getProducts(request):
+    Scraper = Scraper()
+    

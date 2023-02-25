@@ -3,12 +3,15 @@ import time
 import requests
 from datetime import datetime
 from .models import Product
+from .models import Website
+from .models import TagData
 import re
 class Scraper:
     def __init__(self):
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15',
             'Accept-Language': 'en-US'}
+        
         
     def get_page_html(self, product_url):
         page = requests.get(product_url, headers=self.headers)
@@ -113,26 +116,5 @@ class Scraper:
 
     def check_inventory(self):
         urls = {"https://www.inet.se/produkt/6609862/sony-playstation-5-digital-edition", "https://www.inet.se/produkt/6609649/sony-playstation-5", "https://www.komplett.se/product/1111557/gaming/playstation/playstation-5-ps5", "https://www.komplett.se/product/1161553/gaming/playstation/playstation-5-digital-edition-ps5", "https://www.webhallen.com/se/product/346166-MSI-Optix-G251F-25-IPS-1080p-1ms-165Hz-DP-HDMI-HDR-G-Sync", "https://www.netonnet.se/art/gaming/spel-och-konsol/playstation/playstation-konsol/sony-playstation-5-c-chassi/1027489.14413/", "https://www.netonnet.se/art/gaming/spel-och-konsol/playstation/playstation-konsol/sony-playstation-5-standard-god-of-war-ragnarok-voucher/1027712.14413/" }
-        #testUrls = {"https://www.inet.se/produkt/5412819/d-link-e15-ax1500-mesh-range-extender",
-                #"https://www.komplett.se/product/1161554/gaming/tillbehor-till-spelkonsoler/playstation-5-hd-camera",
-               # "https://www.webhallen.com/se/product/346166-MSI-Optix-G251F-25-IPS-1080p-1ms-165Hz-DP-HDMI-HDR-G-Sync",
-                #"https://www.netonnet.se/art/gaming/spel-och-konsol/xbox/xbox-konsol/microsoft-xbox-series-s/1012885.14412/"}
-
-        scraped_data = []
-
-        for url in urls:
-            page_html = self.get_page_html(url)
-
-            if "inet" in url:
-                scraped_data.append(self.check_item_in_stock_inet(page_html))
-
-            elif "komplett" in url:
-                scraped_data.append(self.check_item_in_stock_komplett(page_html))
-
-            elif "webhallen" in url:
-                scraped_data.append(self.check_item_in_stock_webhallen())
-
-            elif "netonnet" in url:
-                scraped_data.append(self.check_item_in_stock_netonnet(page_html))
-        self.save_to_database(scraped_data)
+        print("yes")
         return 1
