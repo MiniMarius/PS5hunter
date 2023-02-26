@@ -20,14 +20,16 @@ The PS5 Hunter project includes/will include the following features:
 
 The PS5 Hunter project requires the following software and libraries to be installed:
 
-- Python 3.6 or higher
-- Django 3.0 or higher
+- Python
+- Django
 - BeautifulSoup4
 - Requests
+- Node
+- npm
 
 ## Usage
 
-In the near future, this project will be deployed for everyone to use. In this stage, to use the PS5 Hunter project, follow these steps:
+To use the PS5 Hunter project, follow these steps:
 
 1. Clone the project repository to your local machine.
 2. Install the required software and libraries listed above.
@@ -36,12 +38,25 @@ In the near future, this project will be deployed for everyone to use. In this s
 
     `python manage.py runserver`
 
-5. Open a web browser and navigate to the local server address provided by Django.
-6. Follow the on-screen prompts to enter your search parameters and obtain the desired stock information.
-
 ## Frontend
 
-The frontend code for the PS5 Hunter project is hosted in a separate repository at [https://github.com/MiniMarius/PS5hunter_frontend](https://github.com/MiniMarius/PS5hunter_frontend). 
+The frontend code for the PS5 Hunter project is a separate React project hosted in a separate repository at [https://github.com/MiniMarius/PS5hunter_frontend](https://github.com/MiniMarius/PS5hunter_frontend).
+
+To use the frontend, follow these steps:
+
+1. Clone the frontend repository to your local machine.
+2. Navigate to the project directory.
+3. Run the following command to install the required dependencies:
+
+    `npm install`
+
+4. Run the following command to start the React server:
+
+    `npm start`
+
+5. Open a web browser and navigate to the local server address provided by React.
+6. Follow the on-screen prompts to use the frontend and interact with the PS5 Hunter web scraping tool.
+
 
 ## Limitations
 
