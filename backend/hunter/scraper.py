@@ -60,29 +60,66 @@ class Scraper:
         soup = BeautifulSoup(response.content, 'html.parser')
 
         # Extract the product information using the specified HTML tags
-        product_name = soup.find(website.relatedTagData.nameTag, website.relatedTagData.nameFilter)
-        product_price = soup.find(website.relatedTagData.priceTag, website.relatedTagData.priceFilter)
-        product_availability = soup.find(website.relatedTagData.availabilityTag, website.relatedTagData.availabilityFilter)
-        product_url = soup.find(website.relatedTagData.urlTag, website.relatedTagData.urlFilter)['href']
+        product_divs = soup.find_all(website.relatedTagData.productTag, website.relatedTagData.productFilter)
+        for product_div in product_divs:
+            product_name_tag = product_div.find(website.relatedTagData.nameTag, website.relatedTagData.nameFilter)
+            if product_name_tag is None:
+                continue
+            product_name = product_name_tag.text.strip()
+            if product_name == "":
+                continue
 
-        print(product_name)
-        print(product_price)
-        print(product_availability)
-        print(product_url)
+            product_price_tag = product_div.find(website.relatedTagData.priceTag, website.relatedTagData.priceFilter)
+            if product_price_tag is None:
+                continue
+            price_text = product_price_tag.text.strip()
+            product_price = ''.join(filter(str.isdigit, price_text))
 
-        # Create a new Product object related to the given Website object
-        product = Product.objects.create(
-            name=product_name,
-            availability=(product_availability == 'In Stock'),
-            url=product_url,
-            price=product_price,
-            website=website,
-            dateCreated=timezone.now(),
-            dateUpdated=timezone.now(),
-        )
-        # Save the new Product object to the database
-        product.save()
-        return product
+            product_availability = False
+            availability_tag = product_div.find(website.relatedTagData.availabilityTag, website.relatedTagData.availabilityFilter)
+            if availability_tag is not None:
+                product_availability = True
+
+            product_url_tag = product_div.find(website.relatedTagData.urlTag, website.relatedTagData.urlFilter)
+            if product_url_tag is None or 'href' not in product_url_tag.attrs:
+                continue
+            product_url = product_url_tag['href']
+
+            # Create a new Product object related to the given Website object
+            product = Product()
+            product.name = product_name
+            product.availability = product_availability
+            product.url = product_url
+            product.price = product_price
+            product.website = website
+            product.dateCreated = timezone.now()
+            product.dateUpdated = timezone.now()
+            # Check if the product already exists in the database
+            try:
+                product = Product.objects.get(name=product_name, website=website)
+            except Product.DoesNotExist:
+                # Create a new Product object related to the given Website object
+                product = Product()
+                product.name = product_name
+                product.availability = product_availability
+                product.url = product_url
+                product.price = product_price
+                product.website = website
+                product.dateCreated = timezone.now()
+            else:
+                # Update the existing product object
+                product.availability = product_availability
+                product.url = product_url
+                product.price = product_price
+                product.dateUpdated = timezone.now()
+
+            try:
+                product.save()
+            except IntegrityError:
+                # handle unique constraint violation (for example, if another scraper instance has already inserted the same product)
+                pass
+            
+        return product_divs
         
     def check_item_in_stock_inet(self, page_html):
         soup = BeautifulSoup(page_html, 'html5lib')
@@ -101,35 +138,6 @@ class Scraper:
         'price': price,
         }
         return data
-
-
-    def check_item_in_stock_komplett(self, page_html):
-        soup = BeautifulSoup(page_html, 'html5lib')
-        in_stock = False
-        div = "div"
-        stock_filter = {"class": "stockstatus"}
-        if soup.find(div, stock_filter):
-            in_stock = True
-        namediv = 'span'
-        namefilter = {'data-bind': 'text: webtext1'}
-        name = soup.find(namediv, namefilter).text
-        price_tag = soup.find('span', {'class': 'product-price-now'})
-        price_number = 0
-        if price_tag:
-            price_text = price_tag.text.strip()
-            price_number = ''.join(filter(str.isdigit, price_text))
-        link_tag = soup.find('link', {'rel': 'canonical'})
-        url = link_tag['href']
-        data = {
-        'name': name,
-        'website': 'Komplett',
-        'availability': in_stock,
-        'url': url,
-        'price': price_number,
-        }
-        return data
-        
-
 
     def check_item_in_stock_netonnet(self, page_html):
         soup = BeautifulSoup(page_html, 'html5lib')

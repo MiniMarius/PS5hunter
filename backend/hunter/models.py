@@ -9,7 +9,7 @@ class Website(models.Model):
 class Product(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=120)
-    availability = models.BooleanField()
+    availability = models.BooleanField(null=True)
     url = models.URLField()
     price = models.FloatField(default=0)
     dateCreated = models.DateTimeField(default=timezone.now)
