@@ -10,6 +10,7 @@ django-cors-headers = "*"
 beautifulsoup4 = "*"
 requests = "*"
 html5lib = "*"
+django-jsonfield = "*"
 
 [dev-packages]
 
