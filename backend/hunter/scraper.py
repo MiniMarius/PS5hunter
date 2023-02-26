@@ -102,7 +102,7 @@ class Scraper:
                 existing_product = Product.objects.get(name=product_name, website=website)
             except Product.DoesNotExist:
                 existing_product = None
-            
+
             if not existing_product:
                 # Create a new Product object related to the given Website object
                 created = True
@@ -114,8 +114,8 @@ class Scraper:
                 existing_product.price = product_price
                 existing_product.dateUpdated = timezone.now()
                 existing_product.save()
-            
-            return created
+
+        return created
 
     # special case, uses webhallen's own server search API
     def check_item_in_stock_webhallen(self):
