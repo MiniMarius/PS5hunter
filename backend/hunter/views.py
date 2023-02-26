@@ -26,21 +26,21 @@ def run_scraper(request):
     scraper = Scraper()
 
     try:
-        products_added_or_updated = scraper.run_scraper()
+        products_added = scraper.run_scraper()
     except ValueError as e:
         return JsonResponse({'error': str(e)}, status=500)
     except Exception:
         return JsonResponse({'error': 'Something went wrong'}, status=500)
 
-    if products_added_or_updated:
+    if products_added:
         response = {
             'status': 'success',
-            'message': 'Products added or updated successfully!',
+            'message': 'Products added successfully!',
         }
     else:
         response = {
         'status': 'success',
-        'message': 'No new products were added or updated.',
+        'message': 'Products were updated successfully!',
         }
     
     return JsonResponse(response)
