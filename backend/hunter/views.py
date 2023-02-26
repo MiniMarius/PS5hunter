@@ -23,16 +23,26 @@ class TagDataView(viewsets.ModelViewSet):
     queryset = TagData.objects.all()
 
 def run_scraper(request):
-    # start scraper
     scraper = Scraper()
-    if not scraper.check_inventory():
+
+    try:
+        products_added_or_updated = scraper.run_scraper()
+    except ValueError as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    except Exception:
         return JsonResponse({'error': 'Something went wrong'}, status=500)
-    
-    response = {
+
+    if products_added_or_updated:
+        response = {
+            'status': 'success',
+            'message': 'Products added or updated successfully!',
+        }
+    else:
+        response = {
         'status': 'success',
-        'message': 'Scraper finished successfully!',
-    }
-    # return a success response
+        'message': 'No new products were added or updated.',
+        }
+    
     return JsonResponse(response)
 
 def getProducts(request):

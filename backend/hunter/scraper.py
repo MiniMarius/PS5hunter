@@ -55,12 +55,15 @@ class Scraper:
     def scrape_website(self, website):
         # Make a request to the website URL
         response = requests.get(website.url, headers=self.headers)
+        response.raise_for_status()
 
         # Parse the HTML content with Beautiful Soup
         soup = BeautifulSoup(response.content, 'html.parser')
 
         # Extract the product information using the specified HTML tags
         product_divs = soup.find_all(website.relatedTagData.productTag, website.relatedTagData.productFilter)
+        if not product_divs:
+            raise ValueError('No products found on website')
         for product_div in product_divs:
             product_name_tag = product_div.find(website.relatedTagData.nameTag, website.relatedTagData.nameFilter)
             if product_name_tag is None:
@@ -96,69 +99,23 @@ class Scraper:
             product.dateUpdated = timezone.now()
             # Check if the product already exists in the database
             try:
-                product = Product.objects.get(name=product_name, website=website)
+                existing_product = Product.objects.get(name=product_name, website=website)
             except Product.DoesNotExist:
+                existing_product = None
+            
+            if not existing_product:
                 # Create a new Product object related to the given Website object
-                product = Product()
-                product.name = product_name
-                product.availability = product_availability
-                product.url = product_url
-                product.price = product_price
-                product.website = website
-                product.dateCreated = timezone.now()
+                created = True
+                product.save()
             else:
                 # Update the existing product object
-                product.availability = product_availability
-                product.url = product_url
-                product.price = product_price
-                product.dateUpdated = timezone.now()
-
-            try:
-                product.save()
-            except IntegrityError:
-                # handle unique constraint violation (for example, if another scraper instance has already inserted the same product)
-                pass
+                existing_product.availability = product_availability
+                existing_product.url = product_url
+                existing_product.price = product_price
+                existing_product.dateUpdated = timezone.now()
+                existing_product.save()
             
-        return product_divs
-        
-    def check_item_in_stock_inet(self, page_html):
-        soup = BeautifulSoup(page_html, 'html5lib')
-        in_stock = False
-        if soup.find('span', class_=['s1ys0gx5', 's14li1pv']):
-            in_stock = True
-        name = soup.find("h1", {"class": "h1meoane h150u3pp"}).text
-        url = soup.find('link', {'rel': 'canonical'})['href']
-        price_with_spaces = soup.find('span', {'class': 'bp5wbcj l1gqmknm'}).text
-        price = price_with_spaces.replace('\xa0', '').replace('kr', '')
-        data = {
-        'name': name,
-        'website': 'Inet',
-        'availability': in_stock,
-        'url': url,
-        'price': price,
-        }
-        return data
-
-    def check_item_in_stock_netonnet(self, page_html):
-        soup = BeautifulSoup(page_html, 'html5lib')
-        in_stock = False
-        if soup.find("div", {"class": "stock-status"}):
-            in_stock = True
-        name = soup.find('meta', {'property': 'og:title'})['content']
-        price_soup = soup.find('div', class_='price-big')
-        price = 0
-        if price_soup:
-            price_text = price_soup.text
-            price = int(''.join(filter(str.isdigit, price_text)))
-        url = soup.find('link', {'rel': 'canonical'})['href']
-        data = {
-        'name': name,
-        'website': 'Netonnet',
-        'availability': in_stock,
-        'url': url,
-        'price': price,
-        }
-        return data
+            return created
 
     # special case, uses webhallen's own server search API
     def check_item_in_stock_webhallen(self):
@@ -179,19 +136,9 @@ class Scraper:
         }
         return data        
     
-    def save_to_database(self, data):
-        for entry in data:
-            product_data = Product(
-                name=entry['name'],
-                website=entry['website'],
-                availability=entry['availability'],
-                url=entry['url'],
-                price=entry['price']
-                )
-            product_data.save()
-
-
-    def check_inventory(self):
+    def run_scraper(self):
         website = self.create_scraping_object_komplett()
-        self.scrape_website(website)
-        return 1
+
+        products_added_or_updated = self.scrape_website(website)
+
+        return products_added_or_updated
