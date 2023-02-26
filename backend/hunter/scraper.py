@@ -26,10 +26,15 @@ class Scraper:
         return tag_data
 
     def create_scraping_object_komplett(self):
+        url = 'https://www.komplett.se/category/12769/gaming/playstation'
+        # Check if website already exists in the database
+        website = Website.objects.filter(url=url).first()
+        if website:
+            return website
         # Define website info
         website = Website()
         website.name = 'Komplett'
-        website.url = 'https://www.komplett.se/category/12769/gaming/playstation'
+        website.url = url
         website.save()
 
         # Define the required HTML tags
@@ -98,6 +103,7 @@ class Scraper:
             product.dateCreated = timezone.now()
             product.dateUpdated = timezone.now()
             # Check if the product already exists in the database
+            created = False
             try:
                 existing_product = Product.objects.get(name=product_name, website=website)
             except Product.DoesNotExist:
