@@ -13,8 +13,10 @@ class Scraper:
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15',
             'Accept-Language': 'en-US'}
         
-    def init_website_tags(self, name_tag, name_filter, price_tag, price_filter, availability_tag, availability_filter, url_tag,  url_filter,):
+    def init_website_tags(self, product_tag, product_filter, name_tag, name_filter, price_tag, price_filter, availability_tag, availability_filter, url_tag,  url_filter,):
         tag_data = TagData()
+        tag_data.productTag = product_tag
+        tag_data.productFilter = product_filter
         tag_data.nameTag = name_tag
         tag_data.nameFilter = name_filter
         tag_data.priceTag = price_tag
@@ -50,7 +52,39 @@ class Scraper:
         url_filter = {"class": "product-link"}
 
         # Initialize the Tag data object
-        tag_data = self.init_website_tags(name_tag, name_filter, price_tag, price_filter, availability_tag, availability_filter, url_tag, url_filter)
+        tag_data = self.init_website_tags(product_tag, product_filter, name_tag, name_filter, price_tag, price_filter, availability_tag, availability_filter, url_tag, url_filter)
+        tag_data.relatedWebsite = website
+        tag_data.save()
+        website.relatedTagData = tag_data
+        website.save()
+        return website
+
+    def create_scraping_object_inet(self):
+        url = 'https://www.inet.se/kategori/751/konsoler'
+        # Check if website already exists in the database
+        website = Website.objects.filter(url=url).first()
+        if website:
+            return website
+        # Define website info
+        website = Website()
+        website.name = 'Inet'
+        website.url = url
+        website.save()
+
+        # Define the required HTML tags
+        product_tag = 'li'
+        product_filter = {'class': 'l1qhmxkx'}
+        name_tag = 'h4'
+        name_filter = {'class': 'h1nslqy4'}
+        price_tag = 'span' 
+        price_filter = {'class': 'bp5wbcj'}
+        availability_tag = 'span'
+        availability_filter = {'class': 's1ys0gx5 s14li1pv'}
+        url_tag = 'a'
+        url_filter = {"class": "a19jwzoe"}
+
+        # Initialize the Tag data object
+        tag_data = self.init_website_tags(product_tag, product_filter, name_tag, name_filter, price_tag, price_filter, availability_tag, availability_filter, url_tag, url_filter)
         tag_data.relatedWebsite = website
         tag_data.save()
         website.relatedTagData = tag_data
@@ -70,6 +104,7 @@ class Scraper:
         if not product_divs:
             raise ValueError('No products found on website')
         for product_div in product_divs:
+            print(product_div)
             product_name_tag = product_div.find(website.relatedTagData.nameTag, website.relatedTagData.nameFilter)
             if product_name_tag is None:
                 continue
@@ -143,8 +178,10 @@ class Scraper:
         return data        
     
     def run_scraper(self):
-        website = self.create_scraping_object_komplett()
+        #website1 = self.create_scraping_object_komplett()
+        website2 = self.create_scraping_object_inet()
 
-        products_added_or_updated = self.scrape_website(website)
+        #products_added_or_updated = self.scrape_website(website1)
+        products_added_or_updated = self.scrape_website(website2)
 
         return products_added_or_updated
