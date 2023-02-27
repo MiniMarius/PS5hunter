@@ -46,8 +46,8 @@ class Scraper:
         name_filter = {'class': 'text-content'}
         price_tag = 'span' 
         price_filter = {'class': 'product-price-now'}
-        availability_tag = "div"
-        availability_filter = {"class": "stockstatus"}
+        availability_tag = 'i'
+        availability_filter = {"class": "icon icon-sm stockstatus-instock"}
         url_tag = 'a'
         url_filter = {"class": "product-link"}
 
@@ -91,6 +91,38 @@ class Scraper:
         website.save()
         return website
 
+    def create_scraping_object_netonnet(self):
+        url = 'https://www.netonnet.se/art/gaming/spel-och-konsol/playstation/playstation-konsol'
+        # Check if website already exists in the database
+        website = Website.objects.filter(url=url).first()
+        if website:
+            return website
+        # Define website info
+        website = Website()
+        website.name = 'Netonnet'
+        website.url = url
+        website.save()
+
+        # Define the required HTML tags
+        product_tag = 'div'
+        product_filter = {'class': 'cProductItem col-xs-12 col-sm-4 col-md-6 col-lg-4 product'}
+        name_tag = 'div'
+        name_filter = {'class': 'subTitle small productList'}
+        price_tag = 'span' 
+        price_filter = {'class': 'price'}
+        availability_tag = 'i'
+        availability_filter = {'class': 'svg small success check'}
+        url_tag = 'div'
+        url_filter = {"class": "leftContent"}
+
+        # Initialize the Tag data object
+        tag_data = self.init_website_tags(product_tag, product_filter, name_tag, name_filter, price_tag, price_filter, availability_tag, availability_filter, url_tag, url_filter)
+        tag_data.relatedWebsite = website
+        tag_data.save()
+        website.relatedTagData = tag_data
+        website.save()
+        return website
+
     def scrape_website(self, website):
         # Make a request to the website URL
         response = requests.get(website.url, headers=self.headers)
@@ -101,10 +133,10 @@ class Scraper:
 
         # Extract the product information using the specified HTML tags
         product_divs = soup.find_all(website.relatedTagData.productTag, website.relatedTagData.productFilter)
+        created = False
         if not product_divs:
             raise ValueError('No products found on website')
         for product_div in product_divs:
-            print(product_div)
             product_name_tag = product_div.find(website.relatedTagData.nameTag, website.relatedTagData.nameFilter)
             if product_name_tag is None:
                 continue
@@ -138,7 +170,6 @@ class Scraper:
             product.dateCreated = timezone.now()
             product.dateUpdated = timezone.now()
             # Check if the product already exists in the database
-            created = False
             try:
                 existing_product = Product.objects.get(name=product_name, website=website)
             except Product.DoesNotExist:
@@ -149,6 +180,7 @@ class Scraper:
                 created = True
                 product.save()
             else:
+                created = False
                 # Update the existing product object
                 existing_product.availability = product_availability
                 existing_product.url = product_url
@@ -178,10 +210,10 @@ class Scraper:
         return data        
     
     def run_scraper(self):
-        #website1 = self.create_scraping_object_komplett()
+        website1 = self.create_scraping_object_komplett()
         website2 = self.create_scraping_object_inet()
 
-        #products_added_or_updated = self.scrape_website(website1)
+        products_added_or_updated = self.scrape_website(website1)
         products_added_or_updated = self.scrape_website(website2)
 
         return products_added_or_updated
