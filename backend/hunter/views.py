@@ -47,12 +47,13 @@ def run_scraper(request):
 
 def create_scraping_object(request):
     scraper = Scraper()
-    scraper.run_scraper(request)
+    created_website = scraper.create_scraping_object(request)
     response = {
         'status': 'success',
         'message': 'Scraping object created successfully!',
+        'website': created_website
     }
-
+        
     return JsonResponse(response)
 
     
