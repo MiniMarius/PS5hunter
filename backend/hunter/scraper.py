@@ -124,26 +124,7 @@ class Scraper:
                 existing_product.dateUpdated = timezone.now()
                 existing_product.save()
 
-        return created
-
-    # special case, uses webhallen's own server search API
-    def check_item_in_stock_webhallen(self):
-        BASE = "https://www.webhallen.com/api/product/"
-        product_id = "320479"
-        req = requests.get(BASE + product_id, headers=self.headers)
-        response_data = req.json()
-        product = response_data["product"]
-        name = product["variants"]["list"][0]["name"]
-        price = float(product["variants"]["list"][0]["price"]["price"])
-        availability = product["variants"]["list"][0]["stock"]["web"] > 0
-        data = {
-        'name': name,
-        'website': 'Webhallen',
-        'availability': availability,
-        'url': '',
-        'price': price,
-        }
-        return data        
+        return created 
     
     def run_scraper(self):
         #gets all website objects from db, scraping each one for new product data
