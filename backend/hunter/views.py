@@ -47,7 +47,7 @@ def run_scraper(request):
 
 def create_scraping_object(request):
     scraper = Scraper()
-    scraper.create_scraping_object
+    scraper.run_scraper(request)
     response = {
         'status': 'success',
         'message': 'Scraping object created successfully!',

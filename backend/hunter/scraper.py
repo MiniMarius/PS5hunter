@@ -242,7 +242,7 @@ class Scraper:
         }
         return data        
     
-    def run_scraper(self):
-        website = self.create_scraping_object()
+    def run_scraper(self, request):
+        website = self.create_scraping_object(request)
         products_added_or_updated = self.scrape_website(website)
         return products_added_or_updated
