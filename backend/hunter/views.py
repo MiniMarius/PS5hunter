@@ -45,6 +45,15 @@ def run_scraper(request):
     
     return JsonResponse(response)
 
-def getProducts(request):
-    Scraper = Scraper()
+def create_scraping_object(request):
+    scraper = Scraper()
+    scraper.create_scraping_object
+    response = {
+        'status': 'success',
+        'message': 'Scraping object created successfully!',
+    }
+
+    return JsonResponse(response)
+
+    
     

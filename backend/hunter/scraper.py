@@ -26,30 +26,30 @@ class Scraper:
         tag_data.urlTag = url_tag
         tag_data.urlFilter = url_filter
         return tag_data
-
-    def create_scraping_object_komplett(self):
-        url = 'https://www.komplett.se/category/12769/gaming/playstation'
+    
+    def create_scraping_object(self, website_data):
+        url = website_data.get('url')
         # Check if website already exists in the database
         website = Website.objects.filter(url=url).first()
         if website:
             return website
         # Define website info
         website = Website()
-        website.name = 'Komplett'
+        website.name = website_data.get('name')
         website.url = url
         website.save()
 
         # Define the required HTML tags
-        product_tag = 'div'
-        product_filter = {'class': 'product-list-item'}
-        name_tag = 'div'
-        name_filter = {'class': 'text-content'}
-        price_tag = 'span' 
-        price_filter = {'class': 'product-price-now'}
-        availability_tag = 'i'
-        availability_filter = {"class": "icon icon-sm stockstatus-instock"}
-        url_tag = 'a'
-        url_filter = {"class": "product-link"}
+        product_tag = website_data.get('product_tag')
+        product_filter = website_data.get('product_filter')
+        name_tag = website_data.get('name_tag')
+        name_filter = website_data.get('name_filter')
+        price_tag = website_data.get('price_tag')
+        price_filter = website_data.get('price_filter')
+        availability_tag = website_data.get('availability_tag')
+        availability_filter = website_data.get('availability_filter')
+        url_tag = website_data.get('url_tag')
+        url_filter = website_data.get('url_filter')
 
         # Initialize the Tag data object
         tag_data = self.init_website_tags(product_tag, product_filter, name_tag, name_filter, price_tag, price_filter, availability_tag, availability_filter, url_tag, url_filter)
@@ -59,69 +59,102 @@ class Scraper:
         website.save()
         return website
 
-    def create_scraping_object_inet(self):
-        url = 'https://www.inet.se/kategori/751/konsoler'
-        # Check if website already exists in the database
-        website = Website.objects.filter(url=url).first()
-        if website:
-            return website
-        # Define website info
-        website = Website()
-        website.name = 'Inet'
-        website.url = url
-        website.save()
 
-        # Define the required HTML tags
-        product_tag = 'li'
-        product_filter = {'class': 'l1qhmxkx'}
-        name_tag = 'h4'
-        name_filter = {'class': 'h1nslqy4'}
-        price_tag = 'span' 
-        price_filter = {'class': 'bp5wbcj'}
-        availability_tag = 'span'
-        availability_filter = {'class': 's1ys0gx5 s14li1pv'}
-        url_tag = 'a'
-        url_filter = {"class": "a19jwzoe"}
+    #def create_scraping_object_komplett(self):
+    #    url = 'https://www.komplett.se/category/12769/gaming/playstation'
+    #    # Check if website already exists in the database
+    #    website = Website.objects.filter(url=url).first()
+    #    if website:
+    #        return website
+    #    # Define website info
+    #    website = Website()
+    #    website.name = 'Komplett'
+    #    website.url = url
+    #    website.save()
+#
+    #    # Define the required HTML tags
+    #    product_tag = 'div'
+    #    product_filter = {'class': 'product-list-item'}
+    #    name_tag = 'div'
+    #    name_filter = {'class': 'text-content'}
+    #    price_tag = 'span' 
+    #    price_filter = {'class': 'product-price-now'}
+    #    availability_tag = 'i'
+    #    availability_filter = {"class": "icon icon-sm stockstatus-instock"}
+    #    url_tag = 'a'
+    #    url_filter = {"class": "product-link"}
+#
+    #    # Initialize the Tag data object
+    #    tag_data = self.init_website_tags(product_tag, product_filter, name_tag, name_filter, price_tag, price_filter, availability_tag, availability_filter, url_tag, url_filter)
+    #    tag_data.relatedWebsite = website
+    #    tag_data.save()
+    #    website.relatedTagData = tag_data
+    #    website.save()
+    #    return website
 
-        # Initialize the Tag data object
-        tag_data = self.init_website_tags(product_tag, product_filter, name_tag, name_filter, price_tag, price_filter, availability_tag, availability_filter, url_tag, url_filter)
-        tag_data.relatedWebsite = website
-        tag_data.save()
-        website.relatedTagData = tag_data
-        website.save()
-        return website
+    #def create_scraping_object_inet(self):
+    #    url = 'https://www.inet.se/kategori/751/konsoler'
+    #    # Check if website already exists in the database
+    #    website = Website.objects.filter(url=url).first()
+    #    if website:
+    #        return website
+    #    # Define website info
+    #    website = Website()
+    #    website.name = 'Inet'
+    #    website.url = url
+    #    website.save()
+#
+    #    # Define the required HTML tags
+    #    product_tag = 'li'
+    #    product_filter = {'class': 'l1qhmxkx'}
+    #    name_tag = 'h4'
+    #    name_filter = {'class': 'h1nslqy4'}
+    #    price_tag = 'span' 
+    #    price_filter = {'class': 'bp5wbcj'}
+    #    availability_tag = 'span'
+    #    availability_filter = {'class': 's1ys0gx5 s14li1pv'}
+    #    url_tag = 'a'
+    #    url_filter = {"class": "a19jwzoe"}
+#
+    #    # Initialize the Tag data object
+    #    tag_data = self.init_website_tags(product_tag, product_filter, name_tag, name_filter, price_tag, price_filter, availability_tag, availability_filter, url_tag, url_filter)
+    #    tag_data.relatedWebsite = website
+    #    tag_data.save()
+    #    website.relatedTagData = tag_data
+    #    website.save()
+    #    return website
 
-    def create_scraping_object_netonnet(self):
-        url = 'https://www.netonnet.se/art/gaming/spel-och-konsol/playstation/playstation-konsol'
-        # Check if website already exists in the database
-        website = Website.objects.filter(url=url).first()
-        if website:
-            return website
-        # Define website info
-        website = Website()
-        website.name = 'Netonnet'
-        website.url = url
-        website.save()
-
-        # Define the required HTML tags
-        product_tag = 'div'
-        product_filter = {'class': 'cProductItem col-xs-12 col-sm-4 col-md-6 col-lg-4 product'}
-        name_tag = 'div'
-        name_filter = {'class': 'subTitle small productList'}
-        price_tag = 'span' 
-        price_filter = {'class': 'price'}
-        availability_tag = 'i'
-        availability_filter = {'class': 'svg small success check'}
-        url_tag = 'div'
-        url_filter = {"class": "leftContent"}
-
-        # Initialize the Tag data object
-        tag_data = self.init_website_tags(product_tag, product_filter, name_tag, name_filter, price_tag, price_filter, availability_tag, availability_filter, url_tag, url_filter)
-        tag_data.relatedWebsite = website
-        tag_data.save()
-        website.relatedTagData = tag_data
-        website.save()
-        return website
+    #def create_scraping_object_netonnet(self):
+    #    url = 'https://www.netonnet.se/art/gaming/spel-och-konsol/playstation/playstation-konsol'
+    #    # Check if website already exists in the database
+    #    website = Website.objects.filter(url=url).first()
+    #    if website:
+    #        return website
+    #    # Define website info
+    #    website = Website()
+    #    website.name = 'Netonnet'
+    #    website.url = url
+    #    website.save()
+#
+    #    # Define the required HTML tags
+    #    product_tag = 'div'
+    #    product_filter = {'class': 'cProductItem col-xs-12 col-sm-4 col-md-6 col-lg-4 product'}
+    #    name_tag = 'div'
+    #    name_filter = {'class': 'subTitle small productList'}
+    #    price_tag = 'span' 
+    #    price_filter = {'class': 'price'}
+    #    availability_tag = 'i'
+    #    availability_filter = {'class': 'svg small success check'}
+    #    url_tag = 'div'
+    #    url_filter = {"class": "leftContent"}
+#
+    #    # Initialize the Tag data object
+    #    tag_data = self.init_website_tags(product_tag, product_filter, name_tag, name_filter, price_tag, price_filter, availability_tag, availability_filter, url_tag, url_filter)
+    #    tag_data.relatedWebsite = website
+    #    tag_data.save()
+    #    website.relatedTagData = tag_data
+    #    website.save()
+    #    return website
 
     def scrape_website(self, website):
         # Make a request to the website URL
@@ -210,10 +243,6 @@ class Scraper:
         return data        
     
     def run_scraper(self):
-        website1 = self.create_scraping_object_komplett()
-        website2 = self.create_scraping_object_inet()
-
-        products_added_or_updated = self.scrape_website(website1)
-        products_added_or_updated = self.scrape_website(website2)
-
+        website = self.create_scraping_object()
+        products_added_or_updated = self.scrape_website(website)
         return products_added_or_updated
