@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import time
 import requests
+import json
 from django.utils import timezone
 from datetime import datetime
 from .models import Product
@@ -12,52 +13,6 @@ class Scraper:
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15',
             'Accept-Language': 'en-US'}
-        
-    def init_website_tags(self, product_tag, product_filter, name_tag, name_filter, price_tag, price_filter, availability_tag, availability_filter, url_tag,  url_filter,):
-        tag_data = TagData()
-        tag_data.productTag = product_tag
-        tag_data.productFilter = product_filter
-        tag_data.nameTag = name_tag
-        tag_data.nameFilter = name_filter
-        tag_data.priceTag = price_tag
-        tag_data.priceFilter = price_filter
-        tag_data.availabilityTag = availability_tag
-        tag_data.availabilityFilter = availability_filter
-        tag_data.urlTag = url_tag
-        tag_data.urlFilter = url_filter
-        return tag_data
-    
-    def create_scraping_object(self, website_data):
-        url = website_data.get('url')
-        # Check if website already exists in the database
-        website = Website.objects.filter(url=url).first()
-        if website:
-            return website
-        # Define website info
-        website = Website()
-        website.name = website_data.get('name')
-        website.url = url
-        website.save()
-
-        # Define the required HTML tags
-        product_tag = website_data.get('product_tag')
-        product_filter = website_data.get('product_filter')
-        name_tag = website_data.get('name_tag')
-        name_filter = website_data.get('name_filter')
-        price_tag = website_data.get('price_tag')
-        price_filter = website_data.get('price_filter')
-        availability_tag = website_data.get('availability_tag')
-        availability_filter = website_data.get('availability_filter')
-        url_tag = website_data.get('url_tag')
-        url_filter = website_data.get('url_filter')
-
-        # Initialize the Tag data object
-        tag_data = self.init_website_tags(product_tag, product_filter, name_tag, name_filter, price_tag, price_filter, availability_tag, availability_filter, url_tag, url_filter)
-        tag_data.relatedWebsite = website
-        tag_data.save()
-        website.relatedTagData = tag_data
-        website.save()
-        return website
 
     def scrape_website(self, website):
         # Make a request to the website URL

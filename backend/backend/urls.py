@@ -26,6 +26,5 @@ router.register(r"tagdata", views.TagDataView, "tagdata")
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-    path('run_scraper/', views.run_scraper, name='run_scraper'),
-    path('create_scraping_object/', views.create_scraping_object, name='create_scraping_object')
+    path('api/run_scraper/', views.run_scraper, name='run_scraper'),
 ]
