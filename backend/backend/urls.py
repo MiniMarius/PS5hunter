@@ -27,9 +27,9 @@ router.register(r"tagdata", TagDataView, "tagdata")
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-    path('api/run_scraper/', run_scraper, name='run_scraper'),
-    path('api/create_user/', create_user, name='create_user'),
-    path('api/token/', TokenObtainPairView.as_view(), name='token-obtain-pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
-    path('api/token/verify/', TokenVerifyView.as_view(), name='token-verify'),
+    path('api/scraper/run/', run_scraper, name='run_scraper'),
+    path('api/auth/register/', create_user, name='create_user'),
+    path('api/auth/token/', TokenObtainPairView.as_view(), name='token-obtain-pair'),
+    path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
+    path('api/auth/token/verify/', TokenVerifyView.as_view(), name='token-verify'),
 ]
