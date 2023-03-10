@@ -2,7 +2,9 @@ from rest_framework import serializers
 from .models import Product
 from .models import Website
 from .models import TagData
-
+from rest_framework.validators import UniqueValidator
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth.models import User
 class TagDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = TagData

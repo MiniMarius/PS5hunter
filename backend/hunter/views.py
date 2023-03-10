@@ -1,9 +1,13 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.db import IntegrityError
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import CreateAPIView
 from rest_framework import viewsets
-from rest_framework.decorators import api_view
-from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from rest_framework import status
 from .serializers import ProductSerializer
 from .serializers import WebsiteSerializer
@@ -12,13 +16,43 @@ from .models import Product
 from .models import Website
 from .models import TagData
 from .scraper import Scraper
-# Create your views here.
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+from rest_framework.permissions import IsAuthenticated
+
+
+@api_view(['POST'])
+def create_user(request):
+    # get the user data from the request
+    username = request.data.get('username')
+    password = request.data.get('password')
+
+    # create the user
+    user = User.objects.create_user(username=username, password=password)
+
+    # return a response indicating success or failure
+    if user:
+        return Response({
+            'success': True,
+            'message': 'User created successfully.',
+            'user_id': user.id,
+            'username': user.username,
+        }, status=status.HTTP_201_CREATED)
+    else:
+        return Response({'error': 'Failed to create user.'}, status=status.HTTP_400_BAD_REQUEST)
 
 class ProductView(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
 
 class WebsiteView(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     serializer_class = WebsiteSerializer
     queryset = Website.objects.all()
 
@@ -60,9 +94,13 @@ class WebsiteView(viewsets.ModelViewSet):
         return Response({'success': 'website deleted'}, status=status.HTTP_200_OK)
 
 class TagDataView(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     serializer_class = TagDataSerializer
     queryset = TagData.objects.all()
 
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def run_scraper(request):
     scraper = Scraper()
 

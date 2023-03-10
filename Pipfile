@@ -11,6 +11,7 @@ beautifulsoup4 = "*"
 requests = "*"
 html5lib = "*"
 django-jsonfield = "*"
+djangorestframework-simplejwt = "*"
 
 [dev-packages]
 

@@ -16,15 +16,20 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from hunter import views
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
+from hunter.views import ProductView, WebsiteView, TagDataView, run_scraper, create_user
 
 router = routers.DefaultRouter()
-router.register(r'product', views.ProductView, 'product')
-router.register(r'website', views.WebsiteView, 'website')
-router.register(r"tagdata", views.TagDataView, "tagdata")
+router.register(r'product', ProductView, 'product')
+router.register(r'website', WebsiteView, 'website')
+router.register(r"tagdata", TagDataView, "tagdata")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-    path('api/run_scraper/', views.run_scraper, name='run_scraper'),
+    path('api/run_scraper/', run_scraper, name='run_scraper'),
+    path('api/create_user/', create_user, name='create_user'),
+    path('api/token/', TokenObtainPairView.as_view(), name='token-obtain-pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
+    path('api/token/verify/', TokenVerifyView.as_view(), name='token-verify'),
 ]

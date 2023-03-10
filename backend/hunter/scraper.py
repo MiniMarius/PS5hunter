@@ -60,6 +60,7 @@ class Scraper:
             product.website = website
             product.dateCreated = timezone.now()
             product.dateUpdated = timezone.now()
+            
             # Check if the product already exists in the database
             try:
                 existing_product = Product.objects.get(name=product_name, website=website)
