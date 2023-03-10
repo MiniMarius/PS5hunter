@@ -17,7 +17,7 @@ from .models import Product
 from .models import Website
 from .models import TagData
 from .scraper import Scraper
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
