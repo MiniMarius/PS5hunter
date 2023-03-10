@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.db import IntegrityError
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from rest_framework.throttling import UserRateThrottle
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.generics import CreateAPIView
 from rest_framework import viewsets
@@ -18,11 +19,6 @@ from .models import TagData
 from .scraper import Scraper
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -101,6 +97,7 @@ class TagDataView(viewsets.ModelViewSet):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+@throttle_classes([UserRateThrottle])
 def run_scraper(request):
     scraper = Scraper()
 
