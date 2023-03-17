@@ -43,4 +43,4 @@ class ProductSerializer(serializers.ModelSerializer):
     website = WebsiteSerializer()
     class Meta:
         model = Product
-        fields = ('name', 'availability', 'url', 'price', 'dateCreated', 'dateUpdated', 'website')
+        fields = ('id', 'name', 'availability', 'url', 'price', 'dateCreated', 'dateUpdated', 'website')
